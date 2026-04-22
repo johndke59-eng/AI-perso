@@ -1,4 +1,5 @@
 local HttpService = game:GetService("HttpService")
+local RunService = game:GetService("RunService")
 
 local ClienteGroq = require(script.Parent.ClienteGroq)
 
@@ -251,6 +252,20 @@ function CerebroNPC:decidirAcaoLocal(contexto)
 end
 
 function CerebroNPC:executarCiclo(contexto, estadoInterno)
+	if self._config.forceLocal == true or RunService:IsClient() then
+		return {
+			origem = "fallback_local",
+			erro = "Modo client-only ativo: chamadas externas desabilitadas",
+			resultado = {
+				thought = "Ambiente client-only detectado. Mantendo somente heuristica local.",
+				speech = "Operando com o cerebro local e leitura direta do ambiente.",
+				action = self:decidirAcaoLocal(contexto),
+				mood = "focado",
+				summary = "Ciclo local executado sem acessar servicos externos.",
+			},
+		}
+	end
+
 	if not self._clienteGroq:estaConfigurado() then
 		return {
 			origem = "fallback_local",
