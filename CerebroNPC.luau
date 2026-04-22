@@ -184,6 +184,29 @@ function CerebroNPC:avaliarContexto(contexto, estadoInterno)
 end
 
 function CerebroNPC:gerarFala(contexto, instrucaoExtra)
+	if self._config.forceLocal == true or RunService:IsClient() then
+		local referencia = contexto
+			and contexto.proximidades
+			and contexto.proximidades[1]
+			and contexto.proximidades[1].descricao
+			or "setor atual"
+
+		local resumo = contexto
+			and contexto.interpretacaoFinal
+			or "Sem leitura contextual detalhada."
+
+		return {
+			speech = string.format(
+				"[%s] Mantendo observacao em %s. %s",
+				(self._config.personalidade and self._config.personalidade.nome) or "Nucleo Local",
+				referencia,
+				instrucaoExtra or "Pronto para novos comandos."
+			),
+			mood = "focado",
+			summary = resumo,
+		}
+	end
+
 	local pacote = self:_criarPacoteContexto(contexto, {
 		modo = "fala",
 		instrucaoExtra = instrucaoExtra,
